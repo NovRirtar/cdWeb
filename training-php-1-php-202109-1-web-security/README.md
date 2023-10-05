@@ -9,3 +9,10 @@
 
 # Features
 - CRUD user
+
+strip_tags($user['name'])
+ALTER TABLE your_table_name
+ADD COLUMN row_version INT NOT NULL DEFAULT 0;
+$rowVersion = $input['row_version'];
+,row_version = row_version + 1
+.' AND row_version = '.$rowVersion

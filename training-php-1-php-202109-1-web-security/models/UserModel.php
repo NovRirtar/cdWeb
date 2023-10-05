@@ -7,7 +7,7 @@ class UserModel extends BaseModel {
     public function findUserById($id) {
         $sql = 'SELECT * FROM users WHERE id = '.$id;
         $user = $this->select($sql);
-
+        // var_dump($user);
         return $user;
     }
 
@@ -49,14 +49,16 @@ class UserModel extends BaseModel {
      * @return mixed
      */
     public function updateUser($input) {
+        
         $sql = 'UPDATE users SET 
                  name = "' . mysqli_real_escape_string(self::$_connection, $input['name']) .'", 
-                 password="'. md5($input['password']) .'"
-                WHERE id = ' . $input['id'];
+                 password="'. md5($input['password']) .'" 
+                // WHERE id = ' . $input['id'] ;
 
         $user = $this->update($sql);
-
+        
         return $user;
+        
     }
 
     /**
