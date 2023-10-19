@@ -3,20 +3,21 @@ require_once 'configs/database.php';
 
 abstract class BaseModel {
     // Database connection
-    protected static $_connection;
+    protected static $_connection; // Đặt thuộc tính tĩnh để có thể truy cập vào nó từ các phương thức tĩnh
 
+    // Hàm khởi tạo để thiết lập giá trị cho $_connection
     public function __construct() {
-
-        if (!isset(self::$_connection)) {
-            self::$_connection = mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT);
-            if (self::$_connection->connect_errno) {
-                printf("Connect failed");
-                exit();
-            }
+        // Khởi tạo và thiết lập kết nối database ở đây
+        self::$_connection = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+        // Kiểm tra kết nối
+        if (self::$_connection->connect_error) {
+            die("Connection failed: " . self::$_connection->connect_error);
         }
-
     }
 
+    public function __destruct() {
+        self::$_connection->close();
+    }
     /**
      * Query in database
      * @param $sql
@@ -70,5 +71,8 @@ abstract class BaseModel {
         $result = $this->query($sql);
         return $result;
     }
-
+    protected function prepare($sql) {
+        $result = $this->_connection->prepare($sql);
+        return $result;
+    }
 }

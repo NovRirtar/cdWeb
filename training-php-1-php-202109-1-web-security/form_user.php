@@ -3,13 +3,16 @@
 session_start();
 require_once 'models/UserModel.php';
 $userModel = new UserModel();
+$csrfToken = bin2hex(random_bytes(32));
 
+// Lưu token vào session
+$_SESSION['csrf_token'] = $csrfToken;
 $user = NULL; //Add new user
 $_id = NULL;
 
 if (!empty($_GET['id'])) {
     $_id = $_GET['id'];
-    $user = $userModel->findUserById($_id);//Update existing user
+    $user = $userModel->findUserById($_id);
 }
 
 
@@ -22,7 +25,6 @@ if (!empty($_POST['submit'])) {
     }
     header('location: list_users.php');
 }
-
 ?>
 <!DOCTYPE html>
 <html>
@@ -39,6 +41,7 @@ if (!empty($_POST['submit'])) {
                     User form
                 </div>
                 <form method="POST">
+                    <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
                     <input type="hidden" name="id" value="<?php echo $_id ?>">
                     <input type="hidden" name="row_version" value="<?php echo  $user[0]['row_version']; ?>">
                     <div class="form-group">

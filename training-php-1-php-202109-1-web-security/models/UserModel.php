@@ -1,6 +1,14 @@
 <?php
 
 require_once 'BaseModel.php';
+function isValidUsername($username) {
+    // Kiểm tra xem chuỗi có chứa ký tự đặc biệt không
+    if (preg_match('/[\'^£$%&*()}{@#~?><>,|=_+¬-]/', $username)) {
+        return false; // Nếu có, trả về false
+    }
+    return true; // Nếu không, trả về true
+}
+
 
 class UserModel extends BaseModel {
 
@@ -11,12 +19,19 @@ class UserModel extends BaseModel {
         return $user;
     }
 
-    public function findUser($keyword) {
-        $sql = 'SELECT * FROM users WHERE user_name LIKE %'.$keyword.'%'. ' OR user_email LIKE %'.$keyword.'%';
-        $user = $this->select($sql);
+   public function findUser($keyword) {
+    // Tránh lỗ hổng SQL injection bằng cách sử dụng mysqli_real_escape_string()
+    $escapedKeyword = mysqli_real_escape_string(self::$_connection, $keyword);
+    
+    // Sử dụng dấu nháy đơn xung quanh chuỗi trong câu lệnh SQL
+    $sql = "SELECT * FROM users WHERE name LIKE '%$escapedKeyword%' OR email LIKE '%$escapedKeyword%'";
+    
+    // Gọi hàm select với câu lệnh SQL đã chuẩn bị
+    $users = $this->select($sql);
 
-        return $user;
-    }
+    return $users;
+}
+
 
     /**
      * Authentication user
@@ -48,18 +63,41 @@ class UserModel extends BaseModel {
      * @param $input
      * @return mixed
      */
+    
+    
     public function updateUser($input) {
+        $rowVersion = $input['row_version'];
+        $name = mysqli_real_escape_string(self::$_connection, $input['name']);
+        $password = md5($input['password']);
         
-        $sql = 'UPDATE users SET 
-                 name = "' . mysqli_real_escape_string(self::$_connection, $input['name']) .'", 
-                 password="'. md5($input['password']) .'" 
-                // WHERE id = ' . $input['id'] ;
-
-        $user = $this->update($sql);
-        
-        return $user;
-        
+        // Kiểm tra xem tên người dùng hợp lệ hay không
+        if (!isValidUsername($name)) {
+            // Nếu tên người dùng không hợp lệ, xử lý hoặc hiển thị thông báo lỗi tùy ý
+            echo "Tên người dùng không hợp lệ. Vui lòng không sử dụng các ký tự đặc biệt.";
+            // Hoặc xử lý lỗi khác tùy theo yêu cầu của bạn
+            // ...
+        } else {
+            // Nếu tên người dùng hợp lệ, tiếp tục thực hiện câu lệnh SQL
+            $sql = 'UPDATE users SET name="' . $name .'", password="' . $password .'", row_version=row_version+1
+                    WHERE id=' . $input['id'] . ' AND row_version=' . $rowVersion;
+            
+            $user = $this->update($sql);
+            return $user;
+        }
     }
+    
+    // public function updateUser($input) {
+    //     $rowVersion = $input['row_version'];
+    //     $sql = 'UPDATE users SET 
+    //              name = "' . mysqli_real_escape_string(self::$_connection, $input['name']) .'", 
+    //              password="'. md5($input['password']) .'" ,row_version = row_version + 1
+    //              WHERE id = ' . $input['id'].' AND row_version = '.$rowVersion ;
+
+    //     $user = $this->update($sql);
+        
+    //     return $user;
+        
+    // }
 
     /**
      * Insert user

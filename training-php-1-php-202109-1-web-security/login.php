@@ -17,7 +17,7 @@ if (!empty($_POST['submit'])) {
         $_SESSION['id'] = $user[0]['id'];
 
         $_SESSION['message'] = 'Login successful';
-        // setcookie("PHPSESSID", session_id(), time() + 3600, "/", "", true, true);
+        setcookie("PHPSESSID", session_id(), time() + 3600, "/", "", true, true);
         // Chuyển hướng đến trang chính hoặc trang người dùng đã đăng nhập thành công
         header('location: list_users.php');
     }else {
@@ -25,7 +25,7 @@ if (!empty($_POST['submit'])) {
         $_SESSION['message'] = 'Login failed';
     }
 
-    // setcookie("PHPSESSID", session_id(), time() + 3600, "/", "", true, true);
+    setcookie("PHPSESSID", session_id(), time() + 3600, "/", "", true, true);
 
 }
 
