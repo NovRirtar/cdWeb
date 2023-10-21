@@ -3,9 +3,9 @@ session_start();
 
 require_once 'models/UserModel.php';
 $userModel = new UserModel();
-
 $users = [];
 $keyword = '';
+
 
 if (!empty($_GET['keyword'])) {
     // Lấy giá trị từ trường tìm kiếm và tránh SQL Injection
@@ -15,7 +15,6 @@ if (!empty($_GET['keyword'])) {
     // Nếu không có keyword, không cần truyền tham số vào hàm getUsers()
     $users = $userModel->getUsers();
 }
-
 
 ?>
 <!DOCTYPE html>
@@ -45,43 +44,45 @@ if (!empty($_GET['keyword'])) {
                     </tr>
                 </thead>
                 <tbody>
-                <?php foreach ($users as $user) {?>
+                    <?php foreach ($users as $user) { ?>
                         <tr>
-                            <th scope="row"><?php echo $user['id']?></th>
+                            <th scope="row"><?php echo $user['id'] ?></th>
                             <td>
-                                <?php echo $user['name']?>
+                                <?php echo $user['name'] ?>
                             </td>
                             <td>
-                                <?php echo $user['fullname']?>
+                                <?php echo $user['fullname'] ?>
                             </td>
                             <td>
-                                <?php echo $user['type']?>
+                                <?php echo $user['type'] ?>
                             </td>
-                            <?php if ( $user['type'] === 'admin' && $user['id'] == '1' && $user['id'] === $id ) {
+                            <?php
+                            if ($user['type'] === 'admin' && $user['id'] == '1' && $user['id'] === $id) {
                                 foreach ($users as $user) { ?>
-                            <td>
-                                <a href="form_user.php?id=<?php echo $user['id'] ?>">
-                                    <i class="fa fa-pencil-square-o" aria-hidden="true" title="Update"></i>
-                                </a>
-                                <a href="view_user.php?id=<?php echo $user['id'] ?>">
-                                    <i class="fa fa-eye" aria-hidden="true" title="View"></i>
-                                </a>
-                                <a href="delete_user.php?id=<?php echo $user['id'] ?>">
-                                    <i class="fa fa-eraser" aria-hidden="true" title="Delete"></i>
-                                </a>
-                            </td>
-                            <?php } }elseif( $user['type'] === 'user' && $user['id'] === $id) { ?>
-                            <td>
-                                <a href="form_user.php?id=<?php echo $user['id'] ?>">
-                                    <i class="fa fa-pencil-square-o" aria-hidden="true" title="Update"></i>
-                                </a>
-                                <a href="view_user.php?id=<?php echo $user['id'] ?>">
-                                    <i class="fa fa-eye" aria-hidden="true" title="View"></i>
-                                </a>
-                                <a href="delete_user.php?id=<?php echo $user['id'] ?>">
-                                    <i class="fa fa-eraser" aria-hidden="true" title="Delete"></i>
-                                </a>
-                            </td>
+                                    <td>
+                                        <a href="form_user.php?id=<?php echo $user['id'] ?>">
+                                            <i class="fa fa-pencil-square-o" aria-hidden="true" title="Update"></i>
+                                        </a>
+                                        <a href="view_user.php?id=<?php echo $user['id'] ?>">
+                                            <i class="fa fa-eye" aria-hidden="true" title="View"></i>
+                                        </a>
+                                        <a href="delete_user.php?id=<?php echo $user['id'] ?>">
+                                            <i class="fa fa-eraser" aria-hidden="true" title="Delete"></i>
+                                        </a>
+                                    </td>
+                                <?php }
+                            }  elseif ($user['type'] === 'user' && $user['id'] === $id  ) { ?>
+                                <td>
+                                    <a href="form_user.php?id=<?php echo $user['id'] ?>">
+                                        <i class="fa fa-pencil-square-o" aria-hidden="true" title="Update"></i>
+                                    </a>
+                                    <a href="view_user.php?id=<?php echo $user['id'] ?>">
+                                        <i class="fa fa-eye" aria-hidden="true" title="View"></i>
+                                    </a>
+                                    <a href="delete_user.php?id=<?php echo $user['id'] ?>">
+                                        <i class="fa fa-eraser" aria-hidden="true" title="Delete"></i>
+                                    </a>
+                                </td>
                             <?php } ?>
                         </tr>
                     <?php } ?>

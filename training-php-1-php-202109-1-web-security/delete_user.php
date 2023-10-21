@@ -3,26 +3,31 @@ session_start();
 require_once 'models/UserModel.php';
 $userModel = new UserModel();
 
-$user = NULL; // Thêm người dùng mới
-$id = NULL;
 
-// Kiểm tra xem có tham số id được truyền qua không
-if (!empty($_GET['id']) && isset($_GET['csrf_token'])) {
-    // Lấy giá trị id và CSRF token từ tham số
+
+
+// Kiểm tra xem người dùng đã đăng nhập chưa
+if (!isset($_SESSION['id'])) {
+    header('location: login.php'); // Chuyển hướng đến trang đăng nhập
+    exit;
+}
+
+// Kiểm tra xem có tham số id và csrf_token được truyền qua không
+if (!empty($_GET['id']) && !empty($_SESSION['csrf_token_delete'])) {
     $id = $_GET['id'];
-    $csrfToken = $_GET['csrf_token'];
+    $csrfToken = $_SESSION['csrf_token_delete'];
 
-    // Kiểm tra xem token từ liên kết có khớp với token trong session không
-    if ($csrfToken === $_SESSION['csrf_token']) {
-        // Token hợp lệ, tiến hành xóa người dùng
+    // Kiểm tra xem id từ URL khớp với id trong session và CSRF token khớp với token trong session không
+    if ($id === $_SESSION['id'] && $csrfToken === $_SESSION['csrf_token_delete']) {
+        // Tiến hành xóa người dùng
         $userModel->deleteUserById($id);
 
-        // Chuyển hướng về trang danh sách người dùng
+        // Chuyển hướng về trang danh sách người dùng hoặc trang chính của người dùng (tùy vào yêu cầu của bạn)
         header('location: list_users.php');
         exit;
     } else {
-        // Token không hợp lệ, từ chối yêu cầu
-        echo "Invalid CSRF Token!";
+        // Id hoặc token không khớp với id hoặc token trong session, từ chối yêu cầu
+        echo "Invalid ID or CSRF Token!";
         exit;
     }
 } else {
@@ -30,4 +35,5 @@ if (!empty($_GET['id']) && isset($_GET['csrf_token'])) {
     echo "Invalid Request!";
     exit;
 }
+
 ?>
